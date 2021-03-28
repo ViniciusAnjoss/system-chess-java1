@@ -2,6 +2,7 @@ package chess.pieces;
 
 import boardgame.Board;
 import boardgame.Position;
+import chess.ChessMatch;
 import chess.ChessPiece;
 import chess.color; 
 
@@ -9,8 +10,11 @@ import chess.color;
 
     public class king extends  ChessPiece {
 	
-	public king (Board board, color color) {
+	private ChessMatch ChessMatch;
+
+	public king (Board board, color color, ChessMatch chessmatch) {
 		super (board, color); 
+		this.ChessMatch = chessmatch;
 	}
 
     @Override
@@ -18,6 +22,12 @@ import chess.color;
 	public String toString() {
 		return "K"; 
 	}
+    
+    private boolean testRookCastling(Position position) {
+		ChessPiece p = (ChessPiece)getBoard().piece(position);
+		return p != null && p instanceof Tower && p.getColor() == getColor() && p.getMoveCount() == 0;
+	}
+
     
     private boolean canMove(Position position) {
     	ChessPiece p = (ChessPiece)getBoard().piece(position);
@@ -78,7 +88,28 @@ import chess.color;
 			mat[p.getRow()][p.getColumn()] = true;
 		}
 		
-		
+		if (getMoveCount() == 0 && !ChessMatch.getCheck()) {
+			// #specialmove castling kingside rook
+			Position posT1 = new Position(Position.getRow(), Position.getColumn() + 3);
+			if (testRookCastling(posT1)) {
+				Position p1 = new Position(Position.getRow(), Position.getColumn() + 1);
+				Position p2 = new Position(Position.getRow(), Position.getColumn() + 2);
+				if (getBoard().piece(p1) == null && getBoard().piece(p2) == null) {
+					mat[Position.getRow()][Position.getColumn() + 2] = true;
+				}
+			}
+			// #specialmove castling queenside rook
+			Position posT2 = new Position(Position.getRow(), Position.getColumn() - 4);
+			if (testRookCastling(posT2)) {
+				Position p1 = new Position(Position.getRow(), Position.getColumn() - 1);
+				Position p2 = new Position(Position.getRow(), Position.getColumn() - 2);
+				Position p3 = new Position(Position.getRow(), Position.getColumn() - 3);
+				if (getBoard().piece(p1) == null && getBoard().piece(p2) == null && getBoard().piece(p3) == null) {
+					mat[Position.getRow()][Position.getColumn() - 2] = true;
+				}
+			}
+		}
+
 		return mat;
 	}
 }
