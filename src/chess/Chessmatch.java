@@ -5,7 +5,7 @@ import boardgame.Piece;
 import boardgame.Position;
 import chess.pieces.Tower;
 import chess.pieces.king;
-import chess.ChessExeption;	
+	
 
 
 
@@ -30,7 +30,8 @@ public class Chessmatch {
 	public ChessPiece performChessmove(ChessPosition sourcePosition, ChessPosition targetPosition) {
 		Position source = sourcePosition.toPosition();
 		Position target = targetPosition.toPosition();
-		validatesourcePosition(source);
+		validateSourcePosition(source);
+		validateTargetPosition(source, target);
 		Piece capturedPiece = makemove(source, target);
 		return (ChessPiece)capturedPiece;
 	}
@@ -39,21 +40,24 @@ public class Chessmatch {
 		Piece capturedPiece = board.removePiece(target);
 		board.placePiece(p, target);
 		return capturedPiece;
-		
 	}
 	
-	private void validatesourcePosition(Position position) {
-		if(!board.thereisAPiece(position)) {
+	private void validateSourcePosition(Position position) {
+		if (!board.thereisAPiece(position)) {
 			throw new ChessExeption("There is no piece on source position");
 		}
 		if (!board.piece(position).isThereAnyPossibleMoves()) {
-				
-			throw new ChessExeption ("There is no possible moves for the chosen piece");	
+			throw new ChessExeption("There is no possible moves for the chosen piece");
 		}
-		
 	}
+	private void validateTargetPosition(Position source, Position target) {
+		if (!board.piece(source).possibleMove(target)) {
+			throw new ChessExeption("The chosen piece can't move to target position");
+		}
+	}
+		
+	
 			
-				
 	private void PlaceNewPiece(char column, int row, ChessPiece piece) {
 		board.placePiece(piece, new ChessPosition(column, row).toPosition());
 	}
